@@ -1,7 +1,7 @@
 version: '3.1'
 
 services:
-# consul
+  # consul
   consul_server_1:
     image: hashicorp/consul:latest
     container_name: "consul_server_1"
@@ -19,16 +19,7 @@ services:
       - ./adnc/consul/server1/config:/consul/config
     privileged: true
     command: >
-      agent
-      -server
-      -bootstrap-expect=3
-      -ui
-      -node=consul_server_1
-      -client='0.0.0.0'
-      -bind='172.25.0.1'
-      -data-dir /consul/data
-      -config-dir /consul/config
-      -datacenter=adnc_dc
+      agent -server -bootstrap-expect=3 -ui -node=consul_server_1 -client='0.0.0.0' -bind='172.25.0.1' -data-dir /consul/data -config-dir /consul/config -datacenter=adnc_dc
 
   consul_server_2:
     image: hashicorp/consul:latest
@@ -49,16 +40,7 @@ services:
     depends_on:
       - consul_server_1
     command: >
-      agent
-      -server
-      -ui
-      -node=consul_server_2
-      -client='0.0.0.0'
-      -bind='172.25.0.2'
-      -datacenter=adnc_dc
-      -data-dir /consul/data
-      -config-dir /consul/config
-      -join=172.25.0.1
+      agent -server -ui -node=consul_server_2 -client='0.0.0.0' -bind='172.25.0.2' -datacenter=adnc_dc -data-dir /consul/data -config-dir /consul/config -join=172.25.0.1
 
   consul_server_3:
     image: hashicorp/consul:latest
@@ -79,16 +61,7 @@ services:
     depends_on:
       - consul_server_1
     command: >
-      agent
-      -server
-      -ui
-      -node=consul_server_3
-      -client='0.0.0.0'
-      -bind='172.25.0.3'
-      -datacenter=adnc_dc
-      -data-dir /consul/data
-      -config-dir /consul/config
-      -join=172.25.0.1
+      agent -server -ui -node=consul_server_3 -client='0.0.0.0' -bind='172.25.0.3' -datacenter=adnc_dc -data-dir /consul/data -config-dir /consul/config -join=172.25.0.1
 
   consul_client_1:
     image: hashicorp/consul:latest
@@ -100,6 +73,8 @@ services:
     networks:
       adnc_network_consul:
         ipv4_address: 172.25.0.4
+      adnc_consul_webapi:
+        ipv4_address: 172.80.0.4
     ports:
       - "8500:8500"
     volumes:
@@ -110,9 +85,9 @@ services:
     depends_on:
       - consul_server_1
     command: "/bin/sh /consul/consul-init.sh"
-# consul end
+  # consul end
 
-# mariadb
+  # mariadb
   mariadb:
     image: mariadb:latest
     container_name: "adnc-mariadb"
@@ -129,9 +104,9 @@ services:
       - ./adnc/mysql/log:/var/log/mysql
       - ./adnc-mysql/db_backups:/docker-entrypoint-initdb.d
     command: --init-file /docker-entrypoint-initdb.d/bootstrap.sql
-# mariadb end
+  # mariadb end
 
-# mongodb
+  # mongodb
   mongodb:
     image: mongo:latest
     container_name: adnc-mongodb
@@ -145,20 +120,20 @@ services:
       MONGO_PASSWORD: football
     restart: always
     volumes:
-        - ./adnc/mongo/data:/data/db
-        - ./adnc-mongodb/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
+      - ./adnc/mongo/data:/data/db
+      - ./adnc-mongodb/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
     ports:
       - 13017:27017
     cpus: 2
     mem_reservation: "400M"
     mem_limit: "500M"
     command:
-        - mongod
-        - --wiredTigerCacheSizeGB=0.5
-        - --auth   
-# mongodb end
+      - mongod
+      - --wiredTigerCacheSizeGB=0.5
+      - --auth
+  # mongodb end
 
-# redis
+  # redis
   redis:
     container_name: adnc-redis-rebloom
     image: redislabs/rebloom:latest
@@ -169,9 +144,9 @@ services:
       - ./adnc/redis/data:/data
     restart: always
     command: redis-server /etc/redis/redis.conf
-# redis end
+  # redis end
 
-# loki
+  # loki
   loki:
     container_name: adnc-loki
     image: grafana/loki:latest
@@ -199,9 +174,9 @@ services:
       - "9010:3000"
     networks:
       - adnc_loki
-# loki end
+  # loki end
 
-# rabbitmq
+  # rabbitmq
   rabbitmq:
     container_name: adnc-rabbitmq
     image: rabbitmq:4.0.7-management
@@ -209,7 +184,7 @@ services:
       - "5672:13572"
       - "15672:18578"
     environment:
-      - RABBITMQ_DEFAULT_USER=admin 
+      - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=football
     restart: always
 # rabbitmq end
@@ -239,5 +214,11 @@ networks:
       config:
         - subnet: "172.25.0.0/16"
           gateway: "172.25.0.16"
+  adnc_consul_webapi:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "172.80.0.0/16"
+          gateway: "172.80.0.16"
   adnc_loki: #loki网络
   adnc_nginx: #nginx网络
