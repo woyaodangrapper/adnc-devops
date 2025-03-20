@@ -99,6 +99,8 @@ services:
     networks:
       adnc_network_consul:
         ipv4_address: 172.25.0.4
+      adnc_consul_webapi:
+        ipv4_address: 172.80.0.4
     ports:
       - "8500:8500"
     volumes:
@@ -117,3 +119,9 @@ networks:
       config:
         - subnet: "172.25.0.0/16"
           gateway: "172.25.0.16"
+  adnc_consul_webapi:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "172.80.0.0/16"
+          gateway: "172.80.0.16"
