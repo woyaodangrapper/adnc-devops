@@ -1,12 +1,8 @@
 #!/bin/bash
 set -e  # 如果有错误，立即退出脚本
-
-
 echo "🚀 正在初始化 Consul K/V..."
-
 # 等待2秒
 sleep 2
-
 # 检查 KV 文件是否存在
 if [ -f "/consul/kv.json" ]; then
   # consul kv import @/consul/kv.json
@@ -16,9 +12,7 @@ if [ -f "/consul/kv.json" ]; then
 else
   echo "⚠️ 未找到 /consul/kv.json，跳过 K/V 导入"
 fi
-
 echo "🔧 正在启动 Consul 客户端代理..."
-
 # 启动 Consul agent
 consul agent \
   -node=consul-client-1 \
@@ -28,5 +22,4 @@ consul agent \
   -config-dir=/consul/config \
   -data-dir=/consul/data \
   -retry-join=172.25.0.1
-
 echo "🎉 Consul 客户端代理已成功启动！"
