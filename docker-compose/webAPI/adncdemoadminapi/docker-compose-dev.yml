@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  adncdemoadminapi:
+    image: adncdemoadminapi:dev
+    container_name: "adncdemoadminapi-dev"
+    #restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+    #  - ASPNETCORE_HOSTINGSTARTUPASSEMBLIES=SkyAPM.Agent.AspNetCore
+    ports:
+      - "50010:80"
+    extra_hosts:
+      - "localhost:192.168.1.35" # 映射 onsul_client ip
+    networks:
+      - docker-compose_adnc_consul_webapi
+
+networks:
+  docker-compose_adnc_consul_webapi:
+    external: true

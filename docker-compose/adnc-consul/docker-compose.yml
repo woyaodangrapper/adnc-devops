@@ -16,7 +16,7 @@ services:
     volumes:
       - ../adnc/consul/server1/data:/consul/data
       - ../adnc/consul/server1/config:/consul/config
-    privileged: true
+    # privileged: true
     command: >
       agent
       -server
@@ -44,7 +44,7 @@ services:
     volumes:
       - ../adnc/consul/server2/data:/consul/data
       - ../adnc/consul/server2/config:/consul/config
-    privileged: true
+    # privileged: true
     depends_on:
       - consul_server_1
     command: >
@@ -74,7 +74,7 @@ services:
     volumes:
       - ../adnc/consul/server3/data:/consul/data
       - ../adnc/consul/server3/config:/consul/config
-    privileged: true
+    # privileged: true
     depends_on:
       - consul_server_1
     command: >
@@ -107,7 +107,7 @@ services:
       - ../adnc/consul/client1/config:/consul/config
       - ./consul-init.sh:/consul/consul-init.sh
       - ./kv.json:/consul/kv.json
-    privileged: true
+    # privileged: true
     depends_on:
       - consul_server_1
     command: "/bin/sh /consul/consul-init.sh"
