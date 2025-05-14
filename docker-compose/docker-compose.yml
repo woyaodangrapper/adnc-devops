@@ -1,7 +1,7 @@
 version: '3.1'
 
 services:
-  # consul
+# consul
   consul_server_1:
     image: hashicorp/consul:latest
     container_name: "consul_server_1"
@@ -85,9 +85,9 @@ services:
     depends_on:
       - consul_server_1
     command: "/bin/sh /consul/consul-init.sh"
-  # consul end
+# consul end
 
-  # mariadb
+# mariadb
   mariadb:
     image: mariadb:latest
     container_name: "adnc-mariadb"
@@ -104,9 +104,9 @@ services:
       - ./adnc/mysql/log:/var/log/mysql
       - ./adnc-mysql/db_backups:/docker-entrypoint-initdb.d
     command: --init-file /docker-entrypoint-initdb.d/bootstrap.sql
-  # mariadb end
+# mariadb end
 
-  # redis
+# redis
   redis:
     container_name: adnc-redis-rebloom
     image: redislabs/rebloom:latest
@@ -117,9 +117,9 @@ services:
       - ./adnc/redis/data:/data
     restart: always
     command: redis-server /etc/redis/redis.conf
-  # redis end
+# redis end
 
-  # loki
+# loki
   loki:
     container_name: adnc-loki
     image: grafana/loki:latest
@@ -147,9 +147,9 @@ services:
       - "9010:3000"
     networks:
       - adnc_loki
-  # loki end
+# loki end
 
-  # rabbitmq
+# rabbitmq
   rabbitmq:
     container_name: adnc-rabbitmq
     image: rabbitmq:4.0.7-management
@@ -160,8 +160,27 @@ services:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=football
     restart: always
-    # rabbitmq end
+# rabbitmq end
 
+# demo
+dotnet-app:
+    image: mcr.microsoft.com/dotnet/aspnet:8.0  # 选择合适的 .NET 版本
+    container_name: youapi_dotnet_server
+    environment:
+       - ASPNETCORE_ENVIRONMENT=Staging
+    working_dir: /app
+    volumes:
+      - ./webAPI/publish:/app  # 将打包后的 Liunx x64 dll 放到这个文件的同级 publish 目录，如果没有 publish 新建一个空的
+    command: ["./youapi"]  # 执行 修改为你的项目 dll 名称
+    networks:
+      adnc_webapi:
+      adnc_consul_webapi:
+          ipv4_address: 172.80.0.1
+    ports:
+      - "50010:8080"  # 你可以根据需要映射端口
+      - "50011:8081"
+    restart: unless-stopped
+# demo end
     #自定义网络，自定义网络可以指定容器IP
 networks:
   adnc_network_consul:
@@ -178,3 +197,4 @@ networks:
           gateway: "172.80.0.16"
   adnc_loki: #loki网络
   adnc_nginx: #nginx网络
+  adnc_webapi: #webapi网络

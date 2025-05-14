@@ -9,4 +9,4 @@ services:
         restart: always
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock:rw
-            - /mnt/user/appdata/portainer-ce:/data:rw
+            - ../adnc/mnt/user/appdata/portainer-ce:/data:rw
